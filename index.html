@@ -41,37 +41,59 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </body>
 </html>
 <script>
-     var dataSet = {
+      var dataSet = {
 		//等待時間---勿動
-		timer:100,
+		redirected : false,
 			
 		//pc時欲設定的連結
 		pcLink:'https://my.taishinbank.com.tw/TIBNetBank/nb.jsp?PageURI=240',
 			
 		//手機時欲設定的連結
-		mobileLink:'https://mobile.taishinbank.com.tw/transfer/funno?funno=54'
+		mobileLink:'https://mkp.taishinbank.com.tw/TsCms/coupon/tsbcoupon.html?couponCode=CP_20220425162343029&openExternalBrowser=1'
 	 };
   
-    var scheme_link = 'tsmb:///twdTransaction/sendRedEnvelope';
-    var download_link = 'intent://taishinbank/#Intent;scheme=tsmb;package=tw.com.taishinbank.mobile;end';
-    var redirected = false;
+   function getParameterByName(name) {
+	name = name.replace(/[\[\]]/g, '\\$&');
+	var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'), results = regex
+			.exec(dataSet.mobileLink);
+	if (!results)
+		return null;
+	if (!results[2])
+		return '';
+	return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	}
+	function openIosApp(allQueryString) {
+		var redirectUrl = 'tsmb:///discount/couponDetail' +allQueryString;
+		setTimeout(function() {
+			if (!document.webkitHidden) {
+			  window.location = 'itms-apps://itunes.apple.com/tw/app/apple-store/id388917170?l=zh&ls=1&mt=8';
+			}
+		}, 25);
+		window.location = encodeURI(redirectUrl);
+	}
+	function openAndroidApp(allQueryString) {
+		var redirectUrl = 'tsmb:///discount/couponDetail' + allQueryString	+ '&openExternalBrowser=1';
+		window.location = encodeURI(redirectUrl);
+		setTimeout(function() {
+			if (!document.webkitHidden && !dataSet.redirected) {
+				dataSet.redirected = true;
+				window.location = 'intent://taishinbank/#Intent;scheme=tsmb;package=tw.com.taishinbank.mobile;end';
+			}
+		}, 1000);	
+	}
+	function openApp() {
+		var couponCode = getParameterByName('couponCode');
+		var allQueryString  = '?couponId='+couponCode;
 
-    if (navigator.userAgent.match(/Android/i)) {
-      window.location = scheme_link;
-      setTimeout(function() {
-      if (!document.webkitHidden && !redirected) {
-        redirected = true;
-        window.location = download_link;
-      }
-      }, 1000);	
-    } else if (navigator.userAgent.match(/(iPhone|iPad|iPod)/i)) {
-      setTimeout(function() {
-        if (!document.webkitHidden) {
-          window.location = 'itms-apps://itunes.apple.com/tw/app/apple-store/id388917170?l=zh&ls=1&mt=8';
-        }
-       }, 25);
-      window.location = scheme_link;
-    }
+		if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+			openIosApp(allQueryString);
+		} else if (navigator.userAgent.match(/Android/i)) {
+			openAndroidApp(allQueryString);
+		} else {
+			window.location = dataSet.pcLink;
+		}
+	}
+	openApp()
 </script>
 
 
