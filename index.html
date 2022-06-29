@@ -41,9 +41,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </body>
 </html>
 <script>
-      var dataSet = {
+     var dataSet = {
 		//等待時間---勿動
 		redirected : false,
+
+		//用戶無安裝APP時，欲設定的連結
+		noInstallAppLink_:'https://my.taishinbank.com.tw/WB/app/',
 			
 		//pc時欲設定的連結
 		pcLink:'https://my.taishinbank.com.tw/TIBNetBank/nb.jsp?PageURI=240',
@@ -51,8 +54,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 		//手機時欲設定的連結
 		mobileLink:'https://mkp.taishinbank.com.tw/TsCms/coupon/tsbcoupon.html?couponCode=CP_20220425162343029&openExternalBrowser=1'
 	 };
-  
-   function getParameterByName(name) {
+	
+	function getParameterByName(name) {
 	name = name.replace(/[\[\]]/g, '\\$&');
 	var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'), results = regex
 			.exec(dataSet.mobileLink);
@@ -61,41 +64,40 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 	if (!results[2])
 		return '';
 	return decodeURIComponent(results[2].replace(/\+/g, ' '));
-	}
-	function openIosApp(allQueryString) {
-		var redirectUrl = 'tsmb:///discount/couponDetail' +allQueryString;
-		setTimeout(function() {
-			if (!document.webkitHidden) {
-			  window.location = 'itms-apps://itunes.apple.com/tw/app/apple-store/id388917170?l=zh&ls=1&mt=8';
-			}
-		}, 25);
-		window.location = encodeURI(redirectUrl);
-	}
-	function openAndroidApp(allQueryString) {
-		var redirectUrl = 'tsmb:///discount/couponDetail' + allQueryString	+ '&openExternalBrowser=1';
-		window.location = encodeURI(redirectUrl);
-		setTimeout(function() {
-			if (!document.webkitHidden && !dataSet.redirected) {
-				dataSet.redirected = true;
-				window.location = 'intent://taishinbank/#Intent;scheme=tsmb;package=tw.com.taishinbank.mobile;end';
-			}
-		}, 1000);	
-	}
-	function openApp() {
-		var couponCode = getParameterByName('couponCode');
-		var allQueryString  = '?couponId='+couponCode;
-
-		if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-			openIosApp(allQueryString);
-		} else if (navigator.userAgent.match(/Android/i)) {
-			openAndroidApp(allQueryString);
-		} else {
-			window.location = dataSet.pcLink;
+}
+function openIosApp(allQueryString) {
+	var redirectUrl = 'tsmb:///discount/couponDetail' +allQueryString;
+	setTimeout(function() {
+		if (!document.webkitHidden) {
+			window.location = dataSet.noInstallAppLink;
 		}
-	}
-	openApp()
-</script>
+	}, 25);
+	window.location = encodeURI(redirectUrl);
+}
+function openAndroidApp(allQueryString) {
+	var redirectUrl = 'tsmb:///discount/couponDetail' + allQueryString	+ '&openExternalBrowser=1';
+	window.location = encodeURI(redirectUrl);
+	setTimeout(function() {
+		if (!document.webkitHidden && !dataSet.redirected) {
+			dataSet.redirected = true;
+			window.location = dataSet.noInstallAppLink;
+		}
+	}, 1000);	
+}
+function openApp() {
+	var couponCode = getParameterByName('couponCode');
+	var allQueryString  = '?couponId='+couponCode;
 
+	if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+		openIosApp(allQueryString);
+	} else if (navigator.userAgent.match(/Android/i)) {
+		openAndroidApp(allQueryString);
+	} else {
+		window.location = dataSet.pcLink;
+	}
+}
+openApp()
+</script>
 
 
 
